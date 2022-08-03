@@ -1,0 +1,1209 @@
+in this module we will learn about using of spring for dependency injection 
+<beans>
+	<bean>
+	<bean>
+	<bean class="name of the class which has to be used" name="name of the bean ">
+	</bean>
+</beans>
+
+how we can inject property instance variable is by using <property name=" "><value></value></property>
+suppose if we want to inject list then we can write it as
+<property name=" ">
+	<list>
+		<value></value>
+		<value></value>
+	</list>
+</property>
+
+Similarly we can use set 
+<property name=" ">
+	<set>
+		<value></value>
+		<value></value>
+	</set>
+</property>
+
+Similarly we can use map
+<property name=" ">
+	<map>
+		<entry key="" value="">
+	</map>
+</property>
+
+another type of primitive variable which is present is properties 
+in class we can initialize it like "Properties propertyName"
+<property>
+	<props>
+		<prop key=" ">its value</prop>
+	</props>
+</property>
+
+when we have to deal with reference types which represent A has a relationship with b (A-----has a----->B)
+then we can represent it as
+<bean class="B" name=""/>     which says we should always first initialize the parent class
+<bean class="A" name="">
+	<property name=B>
+		<ref bean="B"/>
+	</property>	
+</bean>
+-----------------------------or---------------------------------
+<bean class="B" name=""/>     which says we should always first initialize the parent class
+<bean class="A" name="" ref="B"/>	
+</bean>
+-----------------------------or---------------------------------
+<bean class="B" name=""/>     which says we should always first initialize the parent class
+<bean class="A" name="" p:scores-ref="B"/>	
+</bean>
+
+we can pass parameter to the primitive variables by many ways
+like it may contains many other variable in form like "set","map","properties",
+first of all we create the config.xml file which has the all the dependency injection like beans and all.Then we have to create a class in order to inject by using that class
+name in config.xml file. Then we create test class inside src/test/java to test the output 
+for this pusrpose we use "Applicationcontext=classPathXmlApplicationContext("path of the class")
+after than we use the above created variable to find the bean of wanted name 
+then by using that bean we create an object of required class, and System.out.prinln can be used to print the output of the variables. 
+
+Here, there are two types of injecting dependency that are by using "setter and getter methods" or by using constructors
+
+we can have XML configurations like init-method and Destroy-method.In this we can write a method of any name and we can initialize them as init-method:"method name"
+and destroy-method:"method name" in XML configuration file. 
+AbstractApplicationContext are used if we want to call destroy method which are included in the class like
+AbstractApplicationContext context=new ClassPathXmlApplicationContext("xml file path");
+Patient patient=(Patient)context.getBean("patient");
+System.out.println(patient);
+context.registerShutdownHook();
+
+Also, we learn about usage og <ref> which is used to refer the class inside other class
+also we come through p schema where we use p as representing parameter to call it from the class. which can represented like
+<bean class=" " name=" " p:id=" "/>
+
+the annotations are "@PostConstruct" and "@PreDestroy". In java 9 and above we donot have these annotation support so we have to include bean code which is available in the internet.
+we have this included by using the bean like
+<bean class="org.springFramework.context.annotation.CommonAnnotationBeanPostProcessor"/>
+or we can use "<context:annotation-config/>" in order to support annotation in spring
+
+the other init method is, by using spring interface 
+here we extends the class by using the implement "InitializingBean" class which contains the abstract method which has to defined i.e., "afterPropertiesSet" is the method.
+the destroy method is by using "DisposableBean" which acts as destroy method. which contains the abstract method destroy which has to be defined.
+
+"@required" annotation this annotation can be applied above setter or getter methods
+it is the annotation used to specify any field is must.If not initialised then it will rise initializationException 
+in order to enable the annotation we should import some packages like "org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor"
+
+nested bean i.e., inner bean which can be used only if one class has "has a relationship" with other class
+it is used when we want to refer a class from other class.
+then we can used like 
+<bean class="" name="">
+	<property name="">
+		<bean class=""/>
+	</property>
+</bean>
+
+Different bean scopes:-
+singleton - where only one object is instantiated
+prototype - where many objects can be instantiated
+request - based on user request object is created in mvc
+session - the user session object will be created
+global session - this are created only in the spring mvc portlets
+
+by default the scope is singleton, where only object is created,this can be checked using hashcode()
+scope is mentioned in the bean like scope:prototype
+
+constructor injection
+here we use 
+<constructor-arg>
+	<value>....</value>
+</constructor-arg>
+<constructor-arg>
+	<ref bean="class name">                            or      <constructor-arg ref="class name"/>
+</constructor-arg>
+
+just like p schema we can make use of c schema which means it is for constructor for that to happen we have to include the required spring framework things
+xmlns:c="http://www.springframework.org/scheme/c"
+the argument which is passed through argument constructor is usually considered as string, so if we have some more constructors of type double and int. Instead of those
+string parametered constructor is invoked. If we don't have string constructor then it calls according to the initialization of constructors.
+<constructor-arg value="" type="int"/>   this helps in avoiding ambiguity,by using type attribute along with parameters
+
+When we have to mention the orders of the parameters then we use index attribute to mention it
+<constructor-arg value="" type="int" index=0/>
+<constructor-arg value="" type="double" index=1/> 
+
+even  we can use name attribute to mention the specific parameter name we have to pass the argument via constructor
+
+Bean externalisation or reading properties
+here we will put the values like dbServer, dbPort, dbUser, dbPass
+
+in order to access property values from properties file we have to configure in the config.xml file
+<context:property-placeholder location="properties file path">
+then we can do constructor injection
+<constructor-arg>
+	<value>${dbServer}</value>
+</constructor-arg>
+
+Autowiring is used to autowire the object.
+there are differnt types of autowiring method like byType,byName these uses setter injection.
+<bean class="" name="" p:hno="" p:street="" p:city=""/>
+<bean class="" name="" autowire="byType"/>
+
+it will search for the dependency in the given class and then it will initiate them by using setter and getter methods.
+if no bean is present of type which has to be inserted then only null value is inserted.If there are duplicates then it throws exception.
+
+autowire="byName" is similar to type "byType" but here it only searches for the reference of same name which we want to initialize rather than by type.
+
+autowire="constructor" where we inject based on the constructor.
+
+"Annotation based injection"
+<context-annotation-config/>
+here we just mention the annotation @Autowired on the method which is used to set the reference variable.
+then we should use normal beans in config.xml
+<bean class="reference class" name="" p:hno="" p:street=""/>
+<bean class="reference for main class" name=""/>
+
+we can use the "@Autowird" on constructor level as well as field(on top of variabel declaration)
+
+"@Qualifier" is used in case there are two beans of same type which was createing ambiguity in that case we can mention qualifier name above the variable.
+@Qualifier("name of the bean")
+
+we can mention required=false like @Autowired(required=false) so incase if bean is not present then it initialize it to null.
+
+--->Standalone Collections
+util schema
+<util:CN CN-class="" id="">
+	<value/> or <entry>
+</util>
+
+so that we can reuse this in any bean using the reference variable.
+we can use that by specifying as shown below, 
+===> xmlns:c="http://www.springframework.org/scheme/c"
+after this we have to place two more lines in beans
+===>http://www.springframework.org/schema/util
+===>http://www.springframework.org/schema/util/spring-util.xsd">
+
+<util:list list-class="java.util.linkedList" id="productNames">
+	<value>dlkf</value>
+	<value>adfs</value>
+</util:list>
+
+then similar way we can use ==><ref bean="util id"/> inside the property tag
+
+===>Stereotype Annotations
+here one type of annotation is by using @component
+which create object like Instructor instructor=new Instructor();
+-->it should be given path to search for, so it searches given class and its subclasses this can be given as shown below
+<context:component-scan base-package="com.bharath"/>
+we have mention the annotation of @Component on the class declaration
+in getbean we have to use camelized version of the class name to get the object through bean, for example if Male is the class name the we should call male in getbean part of test file.
+
+we can get any name through component annotation using "@Component("inst").
+"@Scope("prototype") used to create any number of objects from class.
+
+we can also inject value using annotype like 
+for primitives, it will be @Value("20") and @Value("Core Java")
+
+for collection, we normally use util, for getting that util value we use
+@Value("#{myList}")
+
+with "@Component" we can use "@Autowired" on top of the another class element within the class element that has to be created which creates a new object by injection.
+
+Spring Expression Language(SpEL) which evaluates and then returns a value.
+example=@value("#{66+44}") which evaluates and return  110.
+similartly ternary operator can also be used.
+
+to invoke a static method inside the expression we can write like
+@Value("#{T(java.lang.Math).abs(-99)}")
+for Integer we can use @Value("#{T(new Integer(88)}")
+for string @Value("#{'some strings'}") we can call .toUppercase on 'some string'.toUpperCase
+
+Advance spring content 
+here we create OrderBO, OrderBOImpl ,OrderDAO ,OrderDAOImpl
+OrderBO has a relationship with OrderDAO class
+know how to include a daoimpl inside the baoimpl class that is as we know using normal reference tag inside the property tag.(just by changing the name we can implement other interface even though one more interface is present)
+Suppose there are two implementation classes which are implemented from same interface then if we have metioned @Component on classes and @Autowired on object variable which have to be created then this may lead to error because of ambiguity which can be avoided by using qualifier and mentioning the name of given inside @Component annotation.
+
+===>Spring JDBC
+
+In order avoid whole lot of code like DriverManager.getConnection etc
+we can use Spring JDBC which contain JDBC technology and Template Design pattern
+
+====>commands used to create a table in mySQLWorkbench
+use mydb;
+create table employee(id int,firstname varchar(20),lastname varchar(20));
+select * from employee;
+
+search for "spring jdbc maven dependency" with respect to the required release we need then copy that into the pom.xml file.It should be done after copying the pre context of the spring framework which is required.
+Then search for Mysql connector maven dependency and copy the code from there and paste in pom.xml
+
+After that we should initialize all the variables like driverClassName,url,username,password via DriverManagerDataSource and it should be connected to the JDBC template which can be done by using the past created datasource
+
+as we have used mysql workbench so the value field of datasources goes like this.
+driverClassName  com.mysql.jdbc.Driver
+url              jdbc:mysql://localhost/mydb
+username
+password
+
+then in config.xml 
+we can either download the bean for DriverManagerDataSource or we can press Ctrl+Shift+T to search for DriverManagerDataSource open it and copy the package name by scrolling upwards
+<bean class="of driverManagerDatasource" name="datasource" p:driverClassName="" p:url="" p:username="" p:password=""/>
+in same way search for JDBC template class and type the bean below the datasource bean
+<bean class="of jdbctemplate" name="jdbcTemplate" p:dataSource-ref="datasource"/>
+
+'''''''''successfully cofigured jdbc template and datasource''''''''''''''''
+
+After this we have to create a new class linking config.xml to get the object from the config file.It will be looking like 
+JdbcTemplate jdbcTemplate=(JdbcTemplate)context.getBean("jdbcTemplate");
+string sql="insert into employee values(?,?,?)";
+int result=jdbcTemplate.update(sql,new Integer(1),"dfjsk","sdfsf"); 
+
+''''''''''''''''''''''''''''''''''After that'''''''''''''''''''''''''''''''''''''
+create a Employee, EmployeeDao, EmployeeDaoImpl
+create a instance variable inside EmployeeDaoImpl which extends the implementation EmployeeDao(EmployeeDao has an abstract method create). create setter and getter instance of the variable jdbcTemplate.
+Inside create method declare 
+String sql="insert into employee values(?,?,?)";
+jdbcTemplate.update(sql,new Integer(1),"dfjsk","sdfsf");
+
+'''''''''''''''''''''''''''''''''After that''''''''''''''''''''''''''''''''''''''
+we have to create test package which contain test class and config.xml file inside that package.
+inside that config.xml we have to bind the EmployeeDaoImpl class to inject into the jdbcTemplate variable.
+everything remains same.We have to add 
+<bean class="class path of EmployeeDaoImpl" name="">
+<property name="jdbcTemplate">
+	<ref bean="jdbcTemplate"/>
+</property>
+</bean>
+
+'''''''''''''''''''''''''''''''''After that'''''''''''''''''''''''''''''''''''''
+we have to create test class inside that.
+ApplicationContext context=new ClassPathXmlApplicationContext("Config.xml file path");
+EmployeeDao dao=(EmployeeDao)context.getBean("employeeDao");
+Employee employee=new Employee();
+employee.setId();
+int result=dao.create(employee);
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+String sql="update employee set firstname=?,lastname=? where id=?"
+int result=jdbcTemplate.update(sql,employee.firstName(),employee.getLastName(),employee.getId());
+return result;
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+queryForObject(String sql,RowMapper<T> rowmapper, Object args):<T>
+query(String sql,RowMapper<T> rowmapper):List<T>
+
+RowMapper<T> is interface in string which maps resultSet---------->object we create.
+where "Employee mapRow(ResultSet rs)" is the method which has to be implemented inside that we have "emp.set(rs.get(1));" to set that into the object.
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''
+to query an object using select we have to create abstract class in interface and we have to define it in emploeeDaoImpl class. Inside that class we have to write 
+{	string sql="select * from employee where id=?";
+	EmployeeRowMapper rowMapper=new EmployeeRowMapper();
+	Employee employee=jdbcTemplate.queryForObject(sql,rowMapper,id);
+	return employee;
+}
+
+after that we will create a class to implement rowMapper interface.it will be like
+public class EmployeeRowMapper implements RowMapper<Employee>{
+	//it has overiding method	
+	@override 
+	public Employee mapRow(ResultSet rs,int rowNum) throws SQLException{
+		Employee emp=new Employee();
+		emp.setId(rs.getInt(1));
+		emp.setFirstName(rs.getString(2));
+		emp.setLastName(rs.getString(3));
+		return emp;
+	}
+}
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+to get a list of records we have to use List<Employee> to store and any method which has to be implemented in EmployeeDaoImpl class.
+public List<Employee> read(){   //call this method from test class
+	String sql="select * from employee";
+	EmployeeRowMapper rowmapper=new EmployeeRowMapper();
+	List<Employee> result=jdbcTemplate.query(sql,rowmapper);  //row mapper is called each for evey rows and it is stored in list.
+	return result;
+} 
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+we can also autowire the things using @Component,@autowire and <context:component-scan base-package=" "/>
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+ORM - Object resource mapping which helps in mapping object in pojo to the object in databases this can be achieved using jpa which provides api for developers and specifications for hibernate. Similar to jdbc template we can use hibernate template here
+productDaoImpl----->ProductDao------>Hibernate Template------>SessionFactory<--------localSessionFactory bean
+
+LocalSessionFactoryBean depends on DataSource, HibernateProperties, annotatedClasses(which all classes map to databases) 
+
+Hibernate Properties
+hibernate.dialect = org.hibernate.dialect.MYSQLDiaelect
+hibernate.show_sql = true
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+ORM mapping can be done using XML and Annotations like @Entity, @Table, @Id, @Column
+
+for example,
+
+@Entity
+@Table(name="emp")                             //used when class name different from table name
+Public class Employee{
+	@Id
+	@Column(name="id")                    //similar to usage of table
+	private int id;
+	@Column(name="firstname")
+	private int firstName;
+	@Column(name="lastName")
+	private int lastName;
+}
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+actions to be carried on workbench
+
+use mydb;
+create table product(id int,name varchar(20),description varchar(100),price decimal(8,3));
+select * from product;
+
+create a maven project and copy all the things from dependencies to build to new pom.xml file and delete spring-jdbc dependencies because we will not be using that in our orm mappings.
+Two additonal dependencies Spring ORM and Hibernate Core are needed
+
+here to get Spring ORM we will be just changing the artifact id to spring-orm
+and for hibernate maven dependency we will be downloading the code snippet from teh internet by searching hibernate maven dependency.
+after that create a product which represent entity class and mention suitable annotation as shown above.
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+create interface ProductDao and ProductDaoImpl.
+Include create method in ProductDao and define it in ProductDaoImpl 
+also include HibernateTemplate in the productDaoImpl which is imported from hibernate5
+5 is mentioned while importing to get from recent hibernate version 5.
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+create a test package and include config.xml inside that, if we copy the same previously created config.xml then remove jdbc template bean and leave datasourceManager bean as it is.
+
+after that create a bean of localSessionFactoryBean
+use ctrl+shift+T to get the class name
+<bean class="org.springFramework.orm.hibernate5.LocalSessionFactoryBean" name="sessionFactory" p:dataSource-ref="datasource">
+	<property name="hibernatePoperties">
+		<props>
+			<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+			<prop key="hibernate.show_sql">true</prop>
+		</props>
+	</property>
+	<property name="annotatedClasses">
+		<list>		
+				<value>Com.bharath.spring.springorm.product.entity.product</value>
+		</list>
+	</property>
+</bean>
+
+then create hibernateTemplate bean
+
+<bean class="org.springFramework.orm.hibernate5.HibernateTemplate" name="hibernateTEmplate" p:sessionFactory-ref="sessionFactory"/>
+
+then use autowire to wire it to the productDaoImpl class.
+TransacationManager is used to maintain the atomicity, to ensure every task is completed or no task is completed.For that, we use HibernateTransactionManager
+along with that <tx:annotation-driven/> annotation in config.xml
+and @Transactional annotation can be placed on any methods to ensure every task gets completed if any exception occur no transaction occurs.
+
+configure the transaction Manager using the bean
+<bean class="org.springFramework.orm.hibernate5.HibernateTransactionManager" name="transactionManager" p:sessionFactory-ref="sessionFactory"/>
+
+then add and make some changes in config.xml setting lines
+xmlns:tx="http://www.springframework.org/scheme/tx"
+http://www.springFramework.org/schema/tx
+http://www.springFramework.org/schema/tx/spring-tx.xsd">
+then add annotation above beans <tx:annotation-driven/>
+
+after that in productDaoIMpl class define create method.
+@Override
+@Transactional
+public int create(Product product){
+	Integer result=(Integer)hibernateTemplate.save(product);
+	return result;
+}
+
+when we see UnsatisfiedDependencyException try changing hibernate version and delet repository file in .m2 folder
+
+create a test class,get daoIMpl class by applicationContext method.
+initilaise all the variable of product object and call the create method on productDao.
+
+last time we saw how to save, now we will see how to update
+create abstract update method in productDao and define it in productDaoImpl
+@Override
+@Transactional
+public void update(Product product){
+	hibernateTemplate.update(product);
+}
+Invoke in test class like productDao.update(product);
+Similarly, we can use hibernateTemplate.delete(product) to delete the object.
+
+to get only one object we use the below following method.
+@Override
+public Product find(int id){
+	Product product=hibernateTemplate.get(Product.class,id);
+	return product;
+}
+
+to get all the product
+@Override
+Public List<Product> findAll(){
+	List<product> products=hibernateTemplate.loadAll(product.class);
+	return products;
+}
+
+---------------------------------------------------------------------------------------------
+
+Spring MVC internally uses three design patterns.
+->Front Controller
+->Handler Mapper
+->View Resolver
+
+workflow      SPRING MVC
+
+client-->web.xml([front controller][Dispatcher servlet]) this contains 2(a)HandleMapper-->controller----->ModelAndView([view][model])<~~data--->web.xml-->ViewResolver(contian prefix,view,suffix)-->Client 
+
+create maven web project of type maven-webapp, copy everything from old pom.xml file to new pom.xml in that change spring-core to spring-webmvc and delete rest all dependencies.
+if you face any error go to properites of selected file, in that search for targeted Runtime and select Apache Tomcat and click ok.
+
+configuration files are put under src/main/resources and sources code are put under src/main/java
+
+Spring MVC Application Creation Steps
+	* Configure the dispatcher servlet
+	* Create the spring configuration
+	* Configure the View Resolver
+	* Create the controller
+	* Create the folder structure and view
+
+to configure dispatcher servlet we have to write below code in <web-app> element
+<servlet>
+	<servlet-name>dispatcher</servlet-name>
+	<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+	<servlet-name>dispatcher</servlet-name>
+	<url-pattern>/</url-pattern>
+</servlet-mapping>
+
+to configure spring configuration we have to copy config.xml from previous file and change its name to dispatcher-servlet.xml and clear every beans inside that.
+
+tol configure the view resolver open dispatcher-servlet.xml 
+<bean class="org.springframework.web.servlet.view.InternalResolverViewResolver" name="viewResolver">
+	<property name="prefix">
+		<value>/WEB-INF/views/</value>
+	</property>
+	<property name="suffix">
+		<value>.jsp</value>
+	</property>
+</bean>
+
+Create the controller
+create the class, here
+@Controller
+public class HelloController{
+	@RequestMapping("/hello")
+	public ModelandView hello(){
+		ModelAndView modelAndView=new ModelAndView();
+		modelAndView.setViewName("hello")
+		return modelAndView;
+}
+
+give contex-componentScan in dispatcher-servlet to create the controller bean.
+
+create the folder view under WEB-INF under that create hello.jsp file and modify the html code as we need.
+
+////////////////////////////////////////////////////////////////////////////////////////
+two variations in sending data
+* controller to the UI
+* UI to the controller
+
+Controller to the UI
+In this modelAndView we can addObject(key,value) and get back the object using request.getAttribute("key")
+
+like ModelAndView modelAndView = new ModelAndView();
+modelAndView.addObject("id",123);
+modelAndView.addObject("name","bharath");
+return modelAndView
+
+after that we can retriev tha content in jsp file like as shown using jsp format
+<% 
+	Integer id=(Integer) request.getAttribute("id");
+	out.println("ID:"+id);
+%>
+
+one more convenient type to retriev the data is using jsp expression language
+Id:<b>${id}></b>
+after mentioning the expression like this we have to remove <!DOCTYPE> in order to make ${id} work.
+
+remember we have to setViewName of the modelAndView and the name inside that is used to redirect it to the mentioned .jsp file.
+
+to send the lists we have to create an arraylist
+ArrayList<Employee> employees = new ArrayList<Employee>();
+employees.add(employee1);
+
+modelAndView.addObject("employee",employees);
+return modelAndView;
+
+while creating the view, first we have to import the employee and util.list in the first line i.e., <% between these using , like import      ,java.util.list%>
+
+Sending data from UI to controller:-
+	* HTML Form(simply send the information from browser to jsp and vice versa)
+	* Query Parameters(@ModelAttribute to retriev the information)
+we should use @ModelAttribute to read the values inside the controller
+
+In order to communicate between the browser and file. We will first create User class  which contains instance variable and setter, getter methods.Then we will write the following code in userReg.jsp file.
+<form action="registerUser" method="post">
+	<pre>
+		Id:<input type="text" name="id"/>            //name should match instance variable name.
+		Name:<input type="text" name="name"/>
+	</pre>
+</form>
+
+after that create the controller by mentioning as below 
+@Controller
+public class UserController{
+	@RequestMapping("registrationPage")
+	public ModelAndView showRegistrationPage(){
+		ModelAndView modelAndView = new ModelAndView();
+		modelAndView.setViewName("userReg");
+		return modelAndView;
+	}
+
+	@RequestMapping(value="registerUser",method=RequestMethod.POST)
+	public ModelAndView registerUser(@ModelAttribute("user") User user){
+		System.out.println(user);
+		ModelAndView modelAndView = new ModelAndView();
+		modelAndView.setViewName("userReg");  //goes back to same page
+		return modelAndView;
+	}
+}
+
+we can redirect it into different page
+@Controller
+public class UserController{
+	@RequestMapping("registrationPage")
+	public ModelAndView showRegistrationPage(){
+		ModelAndView modelAndView = new ModelAndView();
+		modelAndView.setViewName("userReg");
+		return modelAndView;
+	}
+
+	@RequestMapping(value="registerUser",method=RequestMethod.POST)
+	public ModelAndView registerUser(@ModelAttribute("user") User user){
+		System.out.println(user);
+		ModelAndView modelAndView = new ModelAndView();
+		modelAndView.addObject("user",user);
+		modelAndView.setViewName("regResult");  //goes back to different page
+		return modelAndView;
+	}
+}
+
+after that in regResult.jsp file we have to write the following code.to print in console
+<body>
+	<%=request.getAttribute("user")%>
+</body>
+
+Second method is by passing through request parameters.
+In this case we will pass through url using ?key=value&key=value
+and we can retriev those values using @RequestParam("Key)DT methodParam
+here, DT means datatype
+we can write like @RequestParam(value="id",required=false,defaultValue="123")int id
+
+@Controller
+public class RequestParamsController{
+
+	@RequestMapping("/showData")
+	public ModelAndView showData(@RequestParam("id") int id, @RequestParam("name") String name, @RequestParam("sal") double salary{
+		System.out.println("Id:" +id);
+		System.out.println("Name:" +name);
+		System.out.println("Salary:" +salary);
+		return new ModelAndView("userReg");
+	}
+}
+
+we can rewrite as @RequestParam(value="sal",required=false,defaultValue="60") double salary
+
+''''''''''''''''''''''''ModelMap and view''''''''''''''''''''''''''''''''''
+Instead of modelAndView we can use ModelMap(which has method addAttribute(key,value) and string(contains view name)
+like-----------------------------
+				-
+				-
+			       \_/
+@Controller
+public class UserController{
+	@RequestMapping("registrationPage")
+	public String showRegistrationPage(){
+		return "userReg";
+	}
+
+	@RequestMapping(value="registerUser",method=RequestMethod.POST)
+	public String registerUser(@ModelAttribute("user") User user,ModelMap model){
+		System.out.println(user);
+		model.addAttribute("user",user);
+		return "regResult";
+	}
+}
+
+
+'''''''''''''''''''''''''''''SPRING MVC AND ORM'''''''''''''''''''''''''''''''''
+
+use mydb;
+create table user(id int,name varchar(20),email varchar(30));
+select * from user;
+
+then create spring mvc webapp project 
+copy the previous pom.xml file to the newly created mvc file which contains spirng-webmvc(it also contains spring-core,spring-context),we also need spring-orm, hibernate-core, mysql-connector-java dependencies.
+
+In web.xml file we have to write 
+<servlet>
+	<servlet-name>dispatcher</servlet-name>
+	<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+	<servlet-name>dispatcher</servlet-name>
+	<url-pattern>/</url-pattern>
+</servlet-mapping>
+inside </web-app>
+
+create dispatcher-servlet.xml file under WEB-INF folder,copy the same content from dispatcher -servlet.xml of previous project.copy the view resolver bean from the old dispatcher-servlet.xml mvc project.
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Here we will be creating the new maven project.
+
+first of all create the database in php mysql.
+which is know to us.
+create the java folder to store all the coding files.Then we have to create the class called user with respective variables matching to the database created.
+(ctrl+shift+F) for the purpose of formattings.
+then use the annotations like @Entity, @Id on class and its respective variables which are from javax.persistance.Entity, javax.persistence.Id.
+
+Then create userDao interface and it should be used in other classes by using the extend keyword. Then in this class we have to create hibernateTemplate variable, then get the getters and setters to those.
+
+create userService interface.create implementation class UserServiceImpl using the userService implementation.Then mark that with annotation of @Sevice which depends on userDao to do its work.So, we will be adding the userDao variable in that class, mark that variable with @Autowired annotation
+
+create contorller class which depends on the service class.In that create service variable of type UserService variable, and annotate with @Autowired
+
+    Controller     Services        DAL
+userController-->UserService      --UserDao      -- HibernateTemplate
+		    /\           |     /\       |
+		    |            |     |	|
+		UserServiceImpl--   userDaoImpl--           
+
+
+createUser method is declared in Dao interface which is defined in UserDaoImpl.In userDaoImpl make use of hibernateTemplate variable and call save method on that and return result of that.
+
+Then in UserService interface declare method save which takes user as parameter. Then define that method in UserServideImpl.Here make use of the Dao variable and call create method on that and return it and this can be annotated as @Transaction.
+
+In Controller page make use of the @RequestMapping("") to return the requird jsp.
+Similar to the previous request mappings and values, we can declare other methods in this.
+
+mention the content component scan in dispatcher-servlet, make sure to mention the annotated class path 
+
+In web.xml he removed teh top 3 lines by given the reason as it wont work if we give a wrong version to it.In order to get the list of users we call loadAll method on hibernateTemplate.
+
+
+////////////////////////////////////////////////////////////////////////////////
+JSTL.text
+
+web.xml
+
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+          http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+    version="3.0">
+
+Maven Dependencies:
+
+	<dependency>
+		<groupId>jstl</groupId>
+		<artifactId>jstl</artifactId>
+		<version>1.2</version>
+	</dependency>
+	<dependency>
+		<groupId>taglibs</groupId>
+		<artifactId>standard</artifactId>
+		<version>1.1.2</version>
+	</dependency>
+
+Tag Lib Directive:
+
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+//////////////////////////////////////////////////////////////////////////////////// 
+
+*****************jQuery******************
+${"#userId"} this type of syntax can be used to get the value of certain fields.
+To make ajax calls we use three parameters they are:
+url:"" , data:{key:value} , success:function(){}
+These can be called like $.ajax({})
+
+@RequestMapping("validateEmail")
+public @ResponseBody String validateEmail(@RequestParam("id") int id){
+	User user=service.getUser(id);
+	String msg="";
+	if(user!-null){
+		msg=id+"already exists";
+	}
+	return msg;
+}
+
+@ResponseBody is used to tell that it is not a jsp file but instead it is ajax response.
+after that include the jquery library.
+
+then include the script tag.
+<script>
+$(document).ready(function(){
+	$("#id").change(function(){
+		$.ajax({
+			url:'validateEmail',
+			data:{id:$("#id").val()},
+			success:function(responseText){
+				$("#errMsg").text(responseText);
+				
+				if(responseText!=""){
+					$("#id:).focus();
+				}
+			}
+		});
+	});
+});
+</script>
+
+.....................................................................................
+Aspect Oriented programming is typically applying external services without changing the business class code inside it.
+Terminologies in AOP are
+1) Aspect :- it is the external service class
+2) Advice :- these are the external service methods
+3) PointCut :- these are the business class methods which takes the help of external class methods.
+4) JoinPoint :- it is the joining between the business class methods and external service class methods.
+5) Target :- it is the business class
+6) Weaving :- it is the process of applying advices by considering the joinPoint as the reference.
+7) Proxy :- class which is generated as the result of the weaving process.
+Weaving is done by weaver.
+
+Pointcut expressions are used to qualify business methods.
+
+Syntax:
+Access Specifier   Return type  Package.class.methodName()
+    public             int     com.bharath.MyClass.multiply(int,int)
+
+* :- can be used to specify anything.
+.. :- can be used at two levels i.e., at package level(it means current and subpackage)
+			(at parameter level means anytype of parameters)
+
+example : public void *id()   :- this method from any class,any package.
+	  public int *e*(..)  :- any number of parameters with shoudl contain e in method name
+	  public int get(..)  :- any no of parameters
+	  public **()         :- any method with acess specifier as public
+	  public * com.app..*.get*() :- it means current package any class with get method name.
+
+three most used frameworks are AspectJ, Spring AOP, JBoss AOP
+AspectJ Annotation Driven and AspectJ XML Driven.
+
+AspectJ Annotation Driven:-
+	@Before
+	@After
+	@AfterReturning
+	@Around
+	@AfterThrowing
+These are implemented on aspects and advices
+
+Dependencies needed for creating MAVEN AOP project
+
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-aop</artifactId>
+    <version>${springframework.version}</version>
+</dependency>
+<dependency>
+    <groupId>org.aspectj</groupId>
+    <artifactId>aspectjrt</artifactId>
+    <version>1.6.11</version>
+</dependency>
+<dependency>
+    <groupId>org.aspectj</groupId>
+    <artifactId>aspectjweaver</artifactId>
+    <version>1.6.11</version>
+</dependency>
+
+After that create productInterface and productservice class.
+Then create class and annotate with @aspect
+create two methods inside that class
+
+@Before("execution(* com.hrithik.spring.springoop.ProductServiceImple.multiply(..))")
+public void logBefore(JoinPoint joinPoint){
+	System.out.println("Before calling the method");
+	}
+	
+@After("execution(* com.hrithik.spring.springoop.ProductServiceImple.multiply(..))")
+public void logAfter(JoinPoint joinPoint){
+	System.out.println("After the method execution");
+}
+
+then create the config.xml file which should contain the aop scheme similar to the c schema like 'xmlns:aop="http://www.springframework.org/scheme/aop' then we have to write
+http://www.springframework.org/schema/aop
+http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+<aop:aspectj-autoproxy />
+
+<bean name="productService" class="com.bharath.spring.springaop.ProductServiceImpl"/>
+<bean name="loggingAspect" class ="com.bharath.spring.springaop.aspects.logginAspect"/>
+
+At last create the test class using the same format as done before and run it.As we know we should run it by calling the multiply method on the object we have got by calling the getBean on the config.xml file.
+
+After java3.0 we don't have to take the help of xml configuration file.We can do it by using @Configuration
+	class MyConfig{
+		@bean
+		Car car
+to get the spring beans out of it we use
+AnnotationConfigApplicationContext
+we can define multiple configuration and can use import to import to other class file.
+
+we will be creating the dao class with annotation as @Component and after that we will be creating configuration class and we will be annotating with @Bean on the methods inside the class.Then we will be creating the test class. Inside this we will be declaring the variable AnnotationConfigApplicationContext which has parameter of the config class liks springConfig.class. Then by normal way we will be getting the bean.
+during autowire also keep in memory that after declaring @autowired in different class we have to declare @bean in @configuration class with method service which returns the autowired variable with new object.
+we can import the configuration file beans to other configuration using 
+@import(DaoConfig.class)
+
+we can write initMethod and destroymethod inside the bean to see the life cycle.
+We can also use @Scope annotation on the methods.
+
+Now, we instead of using xml files we can declare those in java files by using specific annotations for example, consider web.xml. In this we can declare the things like
+@EnableWebMvc instead of writing <mvc:annotation-driven/>
+@ComponentScan instead of <context:component-scan/>
+@Configuration for configuring the beans.
+lastly, SpringConfig extends WebMvcConfigureAdapter
+
+we will be deleting dispatcher-servlet.xml and web.xml files with java configurations files
+
+we will be first updating the pom.xml with maven servlet dependency.then we have to update the plugins in pom.xml 
+this can be done by copying already present plugin in pom.xml and changing that
+in <artifactId>maven-war-plugin</artifactId>
+ <version>2.4</version>
+ <configuration>
+	<warSourceDirectory>src/main/webapp</warSourceDirectory>	
+	<warName>springmvc</warName>
+	<failonMissingWebXml>false</failonMissingWebXml>
+
+then we have to replace dispatcher-servlet.xml by creating the class springconfig which extends WebMvcConfigurerAdapter annotate this class with @EnableWebMvc, @ComponentScan, @Configuration
+we should add ViewResolver viewResolver method.
+inside that we have to add InternalResourceViewResolver resovler=new InternalResourceViewResolver(); 
+resolver.setPrefix("/WEB-INF/views/");
+resolver.setSuffix(".jsp");
+return resolver;
+then add @bean annotation to the above class.
+
+then override configureDefaultServletHandling method in this
+configure.enable();
+
+this above was for dispatcher-servlet.
+
+now we will write to replace web.xml file
+for that create new class which implements WebApplicationInitializer in this override the method onStartup(ServletContext servletContext) throws ServletException inside this write:
+AnnotationConfigWebApplicationContext webContext = new AnnotationConfigWebApplicationContext();
+webContext.register(SpringConfig.class);
+
+then create ServletRegistration.Dynamic servlet=servletContext.addServlet("dispatcher",new DispatcherServlet(webContext));
+servlet.setLoadOnStartup(1);
+servlet.addMapping("/"); 
+
+.............................................Spring Boot.....................
+no need of writing xml files it automatically create by scanning the dependencies.
+			             ------->@Configuration
+@springBootApplication---------------------->@EnableAutoConfiguration
+				     ------->@ComponentScan
+
+spring-boot-starter        --> which brings all jar files from maven,to get standalone project.
+spring-boot-starter-web   -->brings all web related application
+spring-boot-starter-data-jpa  
+spring-boot-starter-data-rest
+
+inside those jars it contains META-INF/spring.factories
+which has every @Configuration and these configurations are enabled only on the @Condition 
+same applies to HibernateJpaAutoConfiguration
+
+Four ways to create a spring boot
+--> create a maven project and adder the starter dependencies.
+--> user the spring initializer
+--> using IDE
+--> using Spring Boot CLI
+
+Spring initializer:- search for spring initializer in chrome and generate the project.
+after that we try to create two classes with @Component annotation on both the classes and inside that we create consturctor method on that we @autowire a variable of another class.
+
+here, we will see how to invoke and autowire the classes in the test class
+inside the created class
+@Autowired
+ApplicationContext context;
+
+@Test
+public void testService(){
+	Service service=context.getBean(Service.class);
+	service.save();
+}
+
+
+JPA : It uses to do object relational mapping
+providers --- Hibernate
+	      EclipseLink
+	      OpenJPA
+
+here we use key interfaces EntitiManagerFactory which has methods like create, update, read and delete. So they convert object to relational world and vice-versa.
+
+CRUDRepository<---------productRepository-------->CRUD this how we can do crud operations by extending the implemented interfaces.
+
+create spring starter project in spring boot
+then press next, their we get available dependencies, we should select the required appropriate dependency, in our case it is JPA and mysql.
+
+we can get the student row from database and get converted into its object form.
+Student student=findOne(studentid)
+
+but in later 2.x we come up with optional<T> which acts as a check.
+like,,       Optional<T> findById(ID primaryKey)
+Optional<Student> studentOptional= findById(studentId)
+if(studentOptional.isPresent()){
+	Student student=studentOptional.get();
+
+to prevent the raising exception like 'hibernate_sequence' doen't exist which was normally occuring in previous version when we are using annotation like
+
+@Id
+@GeneratedValue(strategy=GenerationType.AUTO)
+private Long id;
+
+so instead of this we can write like below
+
+@Id
+@GeneratedValue(strategy=GenerationType.IDENTITY)
+private long id;
+
+next we will be first creating class, in that we will be annotating with @Entity and @Id after that create the interface which extends from the CrudRepository then click finish.
+after that we have to pass two parameters into that interface those are product and long
+
+then create application.properties file which contain following fields
+spring.database.name=mydatabase
+spring.database.url=jdbc:mysql://localhost:3306/mydb
+spring.datasource.username=root
+spring.datasource.password=test
+
+then after that make some changes in test file 
+i.e., annotate with @Autowired the variable ApplicationContext context;
+
+after that in the annotated @Test method which is 
+public void saveProduct(){
+	ProductRepository repository = context.getBean(ProductRespository.class);
+
+	Product product = new Product();
+	product.setId();
+	respository.save(product)
+	}
+}
+
+Product result = repository.findOne(1L)
+System.out.println(result)
+
+result.setPRice(1500d)
+repository.save(result)
+
+repository.findAll().forEach(p->System.out.println(p.getPrice());}};
+
+goto sprinDocumentation and search for keyword
+if we want to get any object based on keyword attribute we can search it by using 
+findByLastnameAndFirstName so it automatically finds it without extra effort as it already as built in codes so it makes our life easy.
+
+These methods can be placed in ProductRepository method which extends CrudRepository
+like,
+	List<product> findbyName(String name);  //just type findby it automatically suggest the things. 
+
+this above field is invoked in test file like,
+System.out.println(repository.findByName("Mac"));
+
+findByNameAndPrice(String name, Double price) here two parameter is used. 
+
+if we start using spring starter dependency then we donot need to include Dispatcher Servlet or Internal View Resolver it also comes with embedded tomcat server. So everything is already built into it.If we want to customize the internal view Resolver then we have to add the below code into this like
+spring.mvc.view.prefix=#Spring MVC view prefix
+spring.mvc.view.suffix=#Spring MVC view suffix
+
+now we will create new springBoot project by using web dependecies.
+
+after that we will create controller class and annotate @Controller on that class 
+
+@Controller
+public class HelloController{
+	@RequestMapping("/hello")
+	@ResponseBody
+	public String hello(@RequestParam String name){
+		return "hello"+name;	
+	}
+}
+
+inorder to change the default settings in application.properties
+we have to write the below code.
+server.context-path=/springbootweb     //this how we can customize the application.
+so in webbrowser we have to type the following address..
+localhost:8080/springbootweb/hello?name=bharath
+
+RESTFUL WEBSERVICES
+We use the combination of nouns and verbs 
+here verbs means http methods: POST, GET, PUT, DELETE
+here noun means URI/URL like URI:/employees
+
+		GET/employees/1
+REST CONSUMER -----------------> REST PROVIDER
+
+GET/emnployees/1 will forward the request to REST PROVIDER then the it sends back the msg with 200 OK back to the consumer.
+
+same way to update we use 
+
+PUT/employees
+{
+	"name":"bharath"
+	"dept":"psychology"
+}
+
+PATCH/employees to partially update the information in the rest provider.
+
+then we use DELETE/employees/1 in order to delete the respective element from the RESTPROVIDER
+
+it should support multiple formats: 
+like text/xml, application/json , text/plain
+
+to implement the Rest using the spring we have 
+@RestController
+@RequestMapping("/products")
+Controller
+
+and then we can use appropriate methods, upon them we have to place annotations
+@GetMapping
+@PostMapping
+@PutMapping
+@DeleteMapping 
+
+to create restful web service project, first we need to add maven dependency in pom file
+<dependecy>
+	<groupId>org.springFramework.boot</groupId>
+	<artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+
+then we have to add controller class so for that create controller class with annotation @RestController
+@RequestMapping("/products")
+public class ProductController{
+	@Autowired
+	ProductRepository repository
+
+	@GetMapping       //to tell the clients we should get the data using get method
+	public Iterable<Product> getProducts(){
+		return repository.findAll();
+	}
+}
+
+save it, then it can be tested in postman using get method and by using url localhost:8080/products
+
+@PostMapping 
+public Product create(@RequestBody Product product){   //expects product in the request 
+	return repository.save(product);
+    }
+
+
+similarly check for post option in postman
+
+@PutMapping 
+public Product update(@RequestBody Product product){   //expects product in the request 
+	return repository.save(product);
+    }
+
+@GetMapping("/{id}")
+public Product getProduct(@PathVariable("Id") long id){
+	return repository.findOne(id);
+}
+
+
+Q1. What do you understand by the terms Dependency Inversion Principle (DIP), Dependency Injection (DI) and Inversion of Control (IoC) container?
+
+A1. The differences are very subtle and can be hard to understand. Hence, explained via code samples.
+
+1) Dependency Inversion Principle (DIP):  The idea of DIP is that higher layers of your application should not directly depend on lower layers. DIP is the principle that guides us towards DI pattern. 
+
+2) Dependency Injection (DI): is a design pattern where instead of having your objects create a dependency or asking a factory object to make one for you, you pass the needed dependencies into the constructor or via setters from outside the class. This is achieved by defining the dependencies as interfaces, and then injecting in a concrete class implementing that interface via a constructor (i.e. constructor injection) or a setter method (i.e. setter injection). Dependency Injection is a design pattern that allows us to write loosely coupled code for better maintainability,
+
+3) Inversion of Control (IoC): is a software design principle where the framework controls the program flow. Spring framework, Guice, etc are IoC containers that implement the IoC principle.
+
+Q2. What are you “Inverting” in IoC?
+
+A2. Flow of control is “inverted” by dependency injection because you are effectively delegating dependencies to some external system .
+
+Q3. What are the different implementation patterns of IoC principle?
+
+A3. The two implementation patterns of the IoC design principles are
+
+Dependency Injection (DI) pattern: A class is given its dependencies from outside like Spring IoC or JEE 7+ container. It neither knows, nor cares where the dependencies are coming from.
+
+Service Locator (SL) pattern: A class is still responsible for creating its dependencies. It just uses the service locator to do it.
+
+Q4. When will you favor DI type “Constructor Injection” over “Setter Injection”?
+
+A4. Using constructor injection allows you to hide immutable fields from users of your class. Immutable classes don’t declare setter methods. This also enforces that you have the valid objects at the construction time. It also prompts you to rethink about your design when you have too many constructor parameters.
+
+Q5. When will you favor DI type “Setter Injection” over “Constructor Injection”?
+
+A5. In some scenarios, the constructors may get a lot of parameters, which force you to create a lot of overloaded constructors for every way the object might be created. In these scenarios setter injection can be favored over constructor injection, but having too many constructor parameters may be an indication of a bad design.
+
+Q6. Can you describe the bean life cycle?
+
+A6. A Spring Bean represents a POJO (Plain Old Java Object) performing useful operation(s). All Spring Beans reside within a Spring IoC Container. The Spring Framework hides most of the complex infrastructure and the communication that happens between the Spring Container and the Spring Beans.
+
+Spring Bean life cycle means the construction and destruction of the beans and usually this is in relation to the construction and destruction of the Spring Context. Spring has three ways of calling your code during initialization and shut down.
+
+1. Programmatically, usually called ‘interface callbacks’: Spring calls your bean during the setup and tear down of the Spring Context, and your bean needs to implement InitializingBean or DisposableBean. Spring 3.0 has the Lifecycle interface with start/stop lifecycle control methods. The typical use case for this is to control asynchronous processing.
+
+2. Declarative ‘method callbacks’ on a per bean basis: You use a method callback by adding a method to your bean, which you then reference in your XML config. When Spring reads the config it figures out that there’s a bean of type “A” with a method that it needs to call on startup and another it needs to call on shutdown.
+
+3. Declarative ‘method callbacks’ to all beans.
+
+Initialization:
+
+Step 1: The spring container finds the bean’s definition from the XML file or annotations (like @Configuration) and instantiates the bean.
+
+Step 2: Using the dependency injection, spring populates all of the bean properties as specified in the bean definition.
+
+Step 3: If the bean implements the BeanNameAware interface, the factory calls “setBeanName()” passing the bean’s ID.
+
+Step 4: If the bean implements the BeanFactoryAware interface, the factory calls “setBeanFactory()”, passing an instance of itself.
+
+Step 5: If the bean implements the ApplicationContextFactoryAware interface, the container calls “bean.setApplicationContext(container)”.
+
+Step 6: If there are any BeanPostProcessors associated with the bean, their “postProcessBeforeInitialization()” method will be called.
+
+Step 7a: If the bean implements InitializingBean interface, “bean.afterPropertiesSet()” method will be invoked.
+
+Step 7b: If the bean declares custom init method, the container calls custom init method of that bean
+
+Step 8: If there are any BeanPostProcessors associated with the bean, their “postProcessAfterInitialization()” method will be called.
+
+Step 9: Bean is now ready for use.
+
+shutdown:
+
+Step 1: If the bean implements DisposableBean interface, container calls the “bean.destroy()”.
+
+Step 2: If the bean declares custom destroy method, container calls custom destroy method of bean.
+
+Q7. Does Spring dependency injection happen during compile time or runtime?
+
+A7. Runtime during the creation of an object.
+
+Q8. What is the difference between prototype scope and singleton scope? Which one is the default?
+
+A8. Singleton means single bean instance per IoC container, and prototype means any number of object instances per IoC container. The default scope is “singleton”.
+
+Q9. When will you use singleton scope? When will you use prototype scope?
+
+A9. Singleton scope is used for stateless object use. For example, injectiong a DAO (i.e. Data Access Object) into a service object. DAOs don’t need to maintain conversation state. 
+
+For example:
+
+Prototype is useful when your objects maintain state in a multi-threaded environment. Each thread needs to use its own object and cannot share the single object. For example, you might have a RESTFul web service client making multi-threaded calls to Web services. The REST easy client APIs like RESTEasy uses the Apache Connection manager which is not thread safe and each thread should use its own client. Hence, you need to use the prototype scope.
+
+Q10. What happens if you inject a prototype scoped bean into a singleton scoped bean?
+
+A10. A new prototype scoped bean will be injected into a singleton scoped bean once at runtime, and the same prototype bean will be used by the singleton bean.
+
+Q11. What are the scopes defined in Web Application context?
+
+A11. Following scopes are only valid in the context of a web-aware Spring ApplicationContext
+
+Request Scope is for a single bean definition to the lifecycle of a single HTTP request. In other words each and every HTTP request will have its own instance of a bean created off the back of a single bean definition.
+
+Session Scope is for a single bean definition to the lifecycle of a HTTP Session.
+
+Global Session Scope is for a single bean definition to the lifecycle of a global HTTP Session. Typically only valid when used in a Portlet context.
